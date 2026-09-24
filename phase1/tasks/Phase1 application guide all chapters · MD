@@ -1,0 +1,270 @@
+# Phase 1 Application Guide — Hands-On Tasks for Chapters 1–6
+### Turning Notes Into Demonstrated Skill
+
+> Reading the chapter notes gives you conceptual understanding. This file is the *doing* half. Each chapter below has: setup, tasks in order of difficulty, a way to verify you actually did it right (not just "ran a command"), and a deliverable to commit to GitHub. Do not skip tasks because you "understand the concept already" — the whole point of this roadmap is that watched-and-understood is not the same as done-and-verified.
+
+**Environment assumption:** You have your Linux VM set up (Phase 0), Wireshark installed, and basic terminal comfort. If any of that's missing, stop and do Phase 0 first — everything below assumes it.
+
+---
+
+## Chapter 1 — OSI Model & Networking Fundamentals
+
+### Task 1.1 — Capture and label a DNS query (20 min)
+1. Open Wireshark, start capturing on your active interface.
+2. In a terminal: `dig google.com` (or `nslookup google.com`).
+3. Stop capture, filter `dns`.
+4. Click the DNS query packet. In the middle pane, screenshot or write down the exact values for:
+   - Ethernet: source MAC, destination MAC
+   - IP: source IP, destination IP
+   - UDP: source port, destination port
+5. **Verification:** You should be able to point to each of these 4 fields and say which OSI layer it belongs to, without looking at a reference.
+
+### Task 1.2 — Identify device layers in your own network (15 min)
+1. Run `ip route` (or `route -n`) in your VM. Find your default gateway IP.
+2. Run `arp -a` (or `ip neigh`). Find the MAC address associated with your gateway.
+3. **Verification question (answer in writing):** Your gateway is a router — why does your machine need to know its MAC address (Layer 2) even though your final destination (e.g., google.com) is reached via its IP address (Layer 3)?
+
+### Task 1.3 — Encapsulation walkthrough (10 min)
+1. Take the DNS packet from Task 1.1. In Wireshark's middle pane, expand every layer fully (Frame → Ethernet → IP → UDP → DNS).
+2. Write a 4-line "story" describing what each layer added, in the style of the Chapter 1 notes example (Application says X → Transport says Y → Network says Z → Data Link says W).
+
+### Chapter 1 Deliverable
+File: `/phase1/tasks/chapter1-tasks.md`
+Contents: Screenshots/data from Tasks 1.1–1.3, plus written answers to all embedded verification questions.
+
+### Chapter 1 Pass/Fail Check
+You pass this chapter if you can explain, **without opening Wireshark**, what the 4 layers of a DNS query packet look like and why. If you can't do this from memory, redo Task 1.1 and 1.3 before moving on — don't just re-read the notes.
+
+---
+
+## Chapter 2 — Physical Layer, Topologies & Architecture
+
+### Task 2.1 — Decode 3 Ethernet standard names (10 min)
+Without looking anything up, decode what these mean using the pattern from the chapter notes:
+1. `1000BASE-LX`
+2. `100BASE-FX`
+3. `10GBASE-CX4`
+
+Then verify your answers with a single search. Write down which ones you got right/wrong and why.
+
+### Task 2.2 — Design a topology on paper (20 min)
+Sketch (by hand or in draw.io) a small office network:
+- 1 router (internet-facing)
+- 2 switches
+- 8 end devices split across the switches
+- Use a **star topology**
+
+**Verification questions (write answers):**
+1. If one switch fails, which devices lose connectivity? Which don't?
+2. Where would you place a firewall in this diagram, and why there specifically (connect to Chapter 1's device/layer discussion)?
+
+### Task 2.3 — Binary/decimal conversion drill (15 min, timed)
+Convert these by hand, no calculator, then check yourself:
+1. Binary → Decimal: `11001100`, `10101010`, `11111000`
+2. Decimal → Binary: `201`, `47`, `224`
+
+**Verification:** Time yourself. If any single conversion takes over 45 seconds, you need more reps before Chapter 3's subnetting will feel manageable — flag this honestly.
+
+### Chapter 2 Deliverable
+File: `/phase1/tasks/chapter2-tasks.md` — Task 2.1 answers, Task 2.2 diagram + answers, Task 2.3 results with timing noted.
+
+### Chapter 2 Pass/Fail Check
+You pass if your binary/decimal conversions (Task 2.3) are consistently correct and under 45 seconds each. This is a hard prerequisite for Chapter 3 — do not proceed until this is true.
+
+---
+
+## Chapter 3 — Subnetting (The Core Skill Block)
+
+> This chapter's tasks are intentionally the most repetitive in this guide. That's not filler — subnetting fluency only comes from volume.
+
+### Task 3.1 — Magic number drills, batch 1 (30 min, timed)
+Solve these by hand using the magic number method:
+1. `192.168.1.0/27` — list all subnet ranges
+2. `10.0.0.0/25` — list first 4 subnet ranges
+3. `172.16.5.0/29` — list all subnet ranges
+
+**Verification:** Check answers against an online subnet calculator (e.g., subnetting.org) *after* you've solved them — not before, and not while solving.
+
+### Task 3.2 — Reverse problems (20 min, timed)
+1. You need a subnet supporting at least 50 hosts. What mask, and how many hosts does it actually give you?
+2. You need to split a `/24` into exactly 8 equal subnets. What mask do you need for each?
+3. Given `192.168.4.200/26`, which subnet block does this address belong to? What's the broadcast address for that block?
+
+### Task 3.3 — VLSM design exercise (30 min)
+Using `10.20.0.0/16`, design subnets for:
+- Sales: 300 hosts
+- Engineering: 600 hosts
+- IT: 40 hosts
+- Guest WiFi: 15 hosts
+
+For each, specify: required host bits, resulting mask (CIDR), and the actual address range.
+
+### Task 3.4 — Speed test (10 min)
+Solve 5 fresh magic-number subnetting problems (make up your own network/mask combos, or use a random subnet practice generator) back-to-back. Track time per problem.
+
+**Verification:** Your roadmap's competency gate is ~2 minutes per problem by end of Week 6. Track your Task 3.4 average now (Week 3) as a baseline, and re-run this exact test again during Chapter 6's review week to measure improvement.
+
+### Chapter 3 Deliverable
+File: `/phase1/tasks/chapter3-tasks.md` — all worked solutions (show your work, not just final answers), VLSM design table, and your Task 3.4 timing log (baseline + Week 6 retest).
+
+### Chapter 3 Pass/Fail Check
+You pass if you can solve a fresh magic-number problem correctly on the first attempt, showing your work, in under 3 minutes (baseline target — 2 min is the Week 6 target). If you're consistently over 5 minutes or getting wrong answers, this is a "spend more time here before moving on" signal, not a "watch the video again" signal.
+
+---
+
+## Chapter 4 — DNS & DHCP
+
+### Task 4.1 — Observe your own DHCP lease (15 min)
+1. Run `ip a` and note your current IP, and `resolvectl status` (or `cat /etc/resolv.conf`) to find your DNS server.
+2. Release and renew your DHCP lease:
+   ```bash
+   sudo dhclient -r
+   sudo dhclient
+   ```
+3. Run `ip a` again. Did your IP change? Why or why not (relate to lease duration from the chapter notes)?
+
+### Task 4.2 — Capture the DORA exchange (20 min)
+1. Start a Wireshark capture.
+2. Trigger a DHCP renewal (`sudo dhclient -r && sudo dhclient` as above), or disconnect/reconnect your network interface.
+3. Filter: `bootp` or `dhcp` in Wireshark.
+4. Identify all 4 DORA packets (Discover, Offer, Request, Ack). Note the source/destination for each.
+
+**Verification question:** Look at the Request packet's destination — is it unicast (directly to the DHCP server) or broadcast? Confirm this matches what the chapter notes explained, and explain *why* in your own words.
+
+### Task 4.3 — Trace a full DNS resolution (20 min)
+1. Flush your DNS cache: `sudo systemd-resolve --flush-caches` (or equivalent for your distro).
+2. Run: `dig +trace example.com`
+3. Read the output — identify the root servers, the `.com` TLD servers, and the authoritative servers for `example.com` in the trace output.
+
+**Verification:** Write one sentence per hop explaining what that server told the resolver.
+
+### Task 4.4 — Compare A vs CNAME records (10 min)
+1. Run `dig google.com` and `dig www.github.com` — compare which shows an A record directly vs. a CNAME first.
+2. Explain, in writing, why GitHub might use a CNAME for `www.github.com` (hint: think about what happens if GitHub needs to change the underlying server IP).
+
+### Chapter 4 Deliverable
+File: `/phase1/tasks/chapter4-tasks.md` — DORA capture screenshots/data, DNS trace output with your hop-by-hop explanation, A vs. CNAME comparison.
+
+### Chapter 4 Pass/Fail Check
+You pass if you can explain DORA's 4 steps while pointing at your own captured packets (not the textbook example), and can explain the root→TLD→authoritative chain using your own `dig +trace` output.
+
+---
+
+## Chapter 5 — TCP/UDP & the Three-Way Handshake
+
+### Task 5.1 — Capture and dissect the handshake (20 min)
+1. Start a fresh Wireshark capture.
+2. Run `curl http://example.com` (use HTTP, not HTTPS, for a cleaner capture).
+3. Filter: `tcp.flags.syn==1 or tcp.flags.ack==1`
+4. For each of the 3 handshake packets, record: source port, destination port, sequence number, acknowledgment number, and which flags are set.
+
+**Verification:** Confirm the pattern Y = X+1 (each ACK number equals the other side's sequence number + 1) using your *own* captured numbers, not the textbook example.
+
+### Task 5.2 — Capture the teardown (15 min)
+1. In the same capture, filter: `tcp.flags.fin==1`
+2. If the connection closed within your capture window, identify the 4-way FIN/ACK teardown sequence.
+3. If it didn't close (some servers keep connections alive), try again with a tool that closes cleanly, or manually trigger closure.
+
+### Task 5.3 — TCP vs UDP header comparison (15 min)
+1. Capture one TCP packet (from Task 5.1) and one UDP packet (reuse your DNS capture from Chapter 1/4).
+2. Open both in Wireshark, expand the transport-layer header for each.
+3. Write a side-by-side list: which fields exist in TCP that don't exist in UDP? (You should find sequence number, acknowledgment number, window size, flags are TCP-only.)
+
+### Task 5.4 — Reasoning exercise: SYN flood (10 min, no tool needed)
+Without running an actual attack (do not do this against systems you don't own/have permission for), write a paragraph explaining:
+1. What a SYN flood attacker sends
+2. What the server does in response
+3. Why never completing the handshake causes resource exhaustion
+4. Why this specifically exploits something you observed in Task 5.1 (the server allocating state/resources after just the SYN-ACK, before the final ACK arrives)
+
+### Chapter 5 Deliverable
+File: `/phase1/tasks/chapter5-tasks.md` — handshake data (Task 5.1), teardown data (Task 5.2), TCP/UDP comparison table (Task 5.3), SYN flood explanation (Task 5.4).
+
+### Chapter 5 Pass/Fail Check
+You pass if you can explain the handshake using your own captured sequence/ack numbers (not memorized examples) and can explain SYN flood mechanics in your own words without looking at notes.
+
+---
+
+## Chapter 6 — VLANs, Switching & Phase 1 Consolidation
+
+> Chapter 6 doesn't have a Wireshark component (VLANs require actual switch hardware or Packet Tracer/GNS3 to observe directly) — its tasks are design-and-explain focused, plus the full Phase 1 integration test.
+
+### Task 6.1 — Cisco Packet Tracer VLAN lab (45–60 min)
+1. Open Packet Tracer (per your roadmap's Weeks 4–6 resource).
+2. Build: 1 router, 2 switches, 4 PCs (2 per switch).
+3. Configure 2 VLANs (e.g., VLAN 10 "Staff," VLAN 20 "Guest") — assign 2 PCs to each VLAN across both switches.
+4. Configure the inter-switch link as a trunk port.
+5. Test: use Packet Tracer's simulation mode to verify PCs in the same VLAN can ping each other, but PCs in different VLANs cannot (until you add inter-VLAN routing).
+6. **Bonus:** Configure router-on-a-stick to allow controlled inter-VLAN routing, then re-test.
+
+**Verification:** Screenshot the working ping test (same-VLAN success, cross-VLAN failure before routing, cross-VLAN success after routing configured).
+
+### Task 6.2 — VLAN segmentation design for your home-lab diagram (20 min)
+Using the topology you designed in Task 2.2, add VLAN segmentation:
+1. Assign each device group to a VLAN (minimum 3 VLANs: e.g., Trusted, Guest, IoT/Servers)
+2. Specify access vs. trunk ports on your diagram
+3. Justify in 1 paragraph: why does separating Guest from Trusted matter from a security standpoint, not just an organizational one?
+
+### Task 6.3 — Full Phase 1 integration narrative (30 min, no notes)
+Write a single continuous narrative (not bullet points) explaining, end to end:
+> "My laptop joins a Wi-Fi network. Walk through everything that happens, in order, until I successfully load a webpage — include DHCP, DNS, TCP, and where VLANs/switching fit into the picture."
+
+This should be roughly 300–500 words, written from memory, then checked against your Chapter 1–6 notes for gaps.
+
+### Task 6.4 — Subnetting speed retest (10 min, timed)
+Re-run Task 3.4 (5 fresh subnetting problems). Compare your time/accuracy against your Week 3 baseline.
+
+**Verification:** You should be meaningfully faster and more accurate than your Chapter 3 baseline. If not, this is a real gap — don't move to Phase 2 with shaky subnetting.
+
+### Chapter 6 Deliverable
+Files:
+- `/phase1/tasks/chapter6-tasks.md` — Packet Tracer screenshots, VLAN design, integration narrative, subnetting retest comparison
+- `/phase1/home-lab-network-diagram.md` (final version, incorporating VLANs)
+
+### Chapter 6 Pass/Fail Check (this is the Phase 1 exit gate)
+You pass Phase 1 entirely if:
+- [ ] Task 6.3's narrative required no more than 1–2 lookups to complete
+- [ ] Task 6.4 shows improvement over your Chapter 3 baseline
+- [ ] Task 6.1's Packet Tracer lab actually demonstrates working VLAN isolation and (bonus) inter-VLAN routing
+- [ ] You can explain every checklist item from the Chapter 6 notes' "Consolidated Review" section without notes
+
+---
+
+## How to use this file
+
+1. **Do NOT batch all tasks in one sitting per chapter.** Spread Chapter 3's tasks across the week — subnetting fluency needs spaced repetition, not a single cram session.
+2. **Write your answers down, even the "obvious" ones.** The act of writing forces precision that just thinking "yeah I get it" doesn't.
+3. **If a verification check fails, go back — don't push forward.** This is the single most important discipline in this roadmap. A shaky Chapter 3 will make Phase 6 (cloud subnetting) harder, and a shaky Chapter 6 will make Phase 7/8 segmentation reasoning harder.
+4. **Commit after every chapter, not at the end of Phase 1.** Your roadmap explicitly values frequent commits over one big dump — this also gives you a real timestamped record of your pace, useful for the Week 6 subnetting speed comparison.
+
+---
+
+## Master Deliverable Checklist (Phase 1 Complete)
+
+By the time you finish Chapter 6's tasks, your repo's `/phase1/` directory should contain:
+
+```
+/phase1/
+  chapter1-notes.md
+  chapter2-notes.md
+  chapter3-notes.md
+  chapter4-notes.md
+  chapter5-notes.md
+  chapter6-notes.md
+  wireshark-lab-chapter1.md
+  wireshark-lab-chapter5-tcp-udp.md
+  home-lab-network-diagram.md
+  tasks/
+    chapter1-tasks.md
+    chapter2-tasks.md
+    chapter3-tasks.md
+    chapter4-tasks.md
+    chapter5-tasks.md
+    chapter6-tasks.md
+```
+
+This is a genuinely strong, evidence-backed portfolio folder for Phase 1 — not just "I watched Professor Messer," but documented proof of conceptual understanding, hands-on packet capture, timed subnetting proficiency, and a working Packet Tracer VLAN lab.
+
+---
+
+*When all boxes are checked: Phase 1 is done. Move to Phase 2 (Linux + Automation Sprint).*
